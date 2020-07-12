@@ -55,3 +55,31 @@ After k8s cluster is ready, simply execute:
 ```
 kubectl apply -f https://raw.githubusercontent.com/wzong/myk8s/master/network/https/ingress.yaml
 ```
+
+## SSL pass through
+
+For this version of nginx-ingress controller, the following annotations
+are needed if the service is already an HTTPS service:
+
+```yaml
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  ......
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: <SUB_DOMAIN>
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: my-https-service 
+          servicePort: 443
+```
+

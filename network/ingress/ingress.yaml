@@ -346,6 +346,7 @@ spec:
             - /nginx-ingress-controller
             - --http-port=8080
             - --https-port=8440
+            - --enable-ssl-passthrough
             - --election-id=ingress-controller-leader
             - --ingress-class=nginx
             - --configmap=ingress-nginx/ingress-nginx-controller
