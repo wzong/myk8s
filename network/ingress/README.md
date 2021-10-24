@@ -30,12 +30,6 @@ The standard deployment does not work out-of-box, so minor changes are made:
   auto-assign a port, which makes it more difficult for me to set up port
   forwarding (sometimes I destroy the re-create the cluster to test features.
   so I want the ports to be static to avoid reconfiguring port forwarding).
-* Changed `nginx-ingress-controller`'s `--http-port` and `--https-port` to
-  8080/8440, because when using Rancher to create the k8s cluster, it failed
-  to bind to default 80 port
-  ([known issue](https://github.com/kubernetes/ingress-nginx/issues/2783));
-  This change only affects cluster-internal or container-internal ports and
-  has no external effects.
 
 ## SSL certificate
 
@@ -43,8 +37,7 @@ The default self-signed certificate is used, because I want to use a separate
 [HTTPS proxy server](../https/README.md) to pass through and re-encrypt the
 traffic to the Ingress. The benefits are:
 
-* I can configure custom routing rules which are not managed by Ingress (e.g.
-  Rancher server)
+* I can configure custom routing rules which are not managed by Ingress.
 * It's easier and more flexible to auto-renew the CA-signed certificate (e.g.
   use crontab in the proxy docker image vs hack the nginx deployment)
 
@@ -53,7 +46,7 @@ traffic to the Ingress. The benefits are:
 After k8s cluster is ready, simply execute:
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/wzong/myk8s/master/network/https/ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/wzong/myk8s/master/network/ingress/ingress.yaml
 ```
 
 ## SSL pass through
@@ -82,4 +75,3 @@ spec:
           serviceName: my-https-service 
           servicePort: 443
 ```
-

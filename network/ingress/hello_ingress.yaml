@@ -17,7 +17,7 @@ spec:
       - name: hello
         image: gcr.io/google-samples/hello-app:1.0
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         env:
           - name: PORT
             value: "8080"
@@ -38,20 +38,21 @@ spec:
 
 ---
 # Ingress for the hello app
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-ingress
-  annotations:
-    # use the shared ingress-nginx
-    kubernetes.io/ingress.class: "nginx"
 spec:
+  ingressClassName: nginx
   rules:
   - host: hello.<DOMAIN>
     http:
       paths:
       - path: /
+        pathType: 'Prefix'
         backend:
-          serviceName: hello-service
-          servicePort: 80
+          service:
+            name: hello-service
+            port:
+              number: 80
 
