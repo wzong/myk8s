@@ -31,11 +31,16 @@ Therefore, short-term wise, I decided to go with NFS (NAS + cloud backup) approa
 
 Since NFS storage supports `ReadWriteMany` mode, so that a single PersistentVolumnClaim (PVC)
 can be mounted by multiple Pods at the same time as a global storage, and cross-pods sharing
-is possible.
+is possible. Therefore, I end up statically provision a PVC for each of my NFS device.
 
-Therefore, I end up using static provisioning a PVC for each of my NFS device. See example
-at [nfs_example.yaml](./nfs_example.yaml) (In my case the NFS IP address is `192.168.1.160`
-with `/var/nfs` as the path to use for k8s PV).
+See example at [nfs_example.yaml](./nfs_example.yaml) (In my case the NFS IP address is
+`192.168.1.160` with `/var/nfs` as the path to use for k8s PV). To enable NFS on my cluster,
+I also need to execute the following on each node
+
+```shell
+sudo apt-get install nfs-common -y
+sudo service kubelet restart
+```
 
 To test that NFS is successfully mounted to multiple Pods, a `test_k8s_storage.yaml` deployment
 is created to list files under the mounted directories.
