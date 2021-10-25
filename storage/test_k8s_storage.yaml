@@ -1,0 +1,49 @@
+# Deployment for storage app to check mounted persistent volumns
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: storage-deployment
+spec:
+  selector:
+    matchLabels:
+      app: storage
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: storage
+    spec:
+      containers:
+      - name: storage
+        image: wzong/test-k8s-storage:latest
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PV_PATHS
+          value: "/var/pvc0001"
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - mountPath: /var/pvc0001
+          name: pvc0001
+      volumes:
+      - name: pvc0001
+        persistentVolumeClaim:
+          claimName: pvc0001
+
+---
+# Service for the storage app
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage-service
+spec:
+  type: NodePort
+  selector:
+    app: storage
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30010
