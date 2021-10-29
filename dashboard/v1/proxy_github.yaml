@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: oauth2-proxy
+  name: oauth2-proxy
+  namespace: kubernetes-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: oauth2-proxy
+  template:
+    metadata:
+      labels:
+        k8s-app: oauth2-proxy
+    spec:
+      containers:
+      - args:
+        - --provider=github
+        - --email-domain=*
+        - --http-address=0.0.0.0:4180
+        - --cookie-expire=20h
+        env:
+        ##############################################
+        # OAUTH2-PROVIDER-CONFIG
+        - name: OAUTH2_PROXY_COOKIE_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: github-secret
+              key: cookie_secret
+        - name: OAUTH2_PROXY_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              name: github-secret
+              key: client_id
+        - name: OAUTH2_PROXY_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: github-secret
+              key: client_secret
+        - name: OAUTH2_PROXY_GITHUB_ORG
+          valueFrom:
+            secretKeyRef:
+              name: github-secret
+              key: github_org
+        - name: OAUTH2_PROXY_GITHUB_TEAM
+          valueFrom:
+            secretKeyRef:
+              name: github-secret
+              key: github_team
+        ##############################################
+        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        imagePullPolicy: Always
+        name: oauth2-proxy
+        ports:
+        - containerPort: 4180
+          protocol: TCP
