@@ -84,6 +84,19 @@ Deployment steps:
       kubectl apply -f v1/proxy_azure_ad.yaml
       ```
 
+    * GitHub:
+
+      ```shell
+      kubectl create secret generic github-secret -n kubernetes-dashboard \
+      --from-literal=cookie_secret=$(python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))') \
+      --from-literal=client_id=<your github app client id> \
+      --from-literal=client_secret=<your github app client secret> \
+      --from-literal=github_org=<your github org> \
+      --from-literal=github_team=<your team>
+
+      kubectl apply -f v1/proxy_github.yaml
+      ```
+
 2. Deploy the k8s dashboard:
 
     ```shell
