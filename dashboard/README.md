@@ -25,9 +25,9 @@ Cons:
 
 This can be easily achieved following the docs on Github.
 
-## v1: oauth2-proxy + optional SkipLogin
+## v1: SSO + optional SkipLogin
 
-### v1.1: OAuth2 Proxy
+### v1.1: SSO with OAuth2 Proxy
 
 It seems to be popular to place the k8s dashboard web UI behind an
 [oauth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy).
@@ -49,10 +49,13 @@ This can be achieved with:
 2. Create an Ingress for the `kubernetes-dashboard` Service, with
    `nginx.ingress.kubernetes.io/auth-url` annotation point to the oauth2-proxy endpoints.
 
-In my case, I enabled SkipLogin below to make it easier for myself (however, I'm considering
-switching back to v1.1 or implement v2, for more granular ACL management and better security).
+See the [auth module](../auth/README.md) for the deployment steps. After that, the dashboard can be
+visited at `https://dashboard.mysite.com` and redirect to `https://login.mysite.com/oauth2/start`
+for login (Please ensure that the dashboard and oauth2 hosts are
+[SameSite](https://web.dev/samesite-cookies-explained/) for security compliance).
 
 ### v1.2: SkipLogin
+
 To bypass the SA-token authenticate after OAuth2 authentication, we can enable the SkipLogin
 feature on the K8S dashboard server. The dashboard server can display a `SKIP` button in the login page. Clicking on the button will bypass the login, and use previledges of the dashboard server's SA, which by default has near-zero access to the cluster's information.
 Therefore we also need to expand the previledges of the dashboard server SA.
@@ -67,60 +70,32 @@ Cons:
 * Anyone who can pass the OAuth2 authentication will have the same access. It's impossible to
   achieve more granular access control.
 
-Deployment steps:
+This can be achieved with:
 
-1. Create OAuth2 Provider secrets and deploy oauth2-proxy server:
+1. Grant the dashboard server SA `cluster-admin` role:
 
-    * AzureAD: (This was just to play around AzureAD, but it proved to be way too complex than what
-      I need, so I'm switching back to Github)
+    ```shell
+    kubectl apply -f v1/dashboard_admin.yaml
+    ```
 
-      ```shell
-      kubectl create secret generic azure-ad-secret -n kubernetes-dashboard \
-      --from-literal=cookie_secret=$(python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))') \
-      --from-literal=oidc_issuer_url=https://login.microsoftonline.com/<your AD tenant id> \
-      --from-literal=client_id=<your azure AD client id> \
-      --from-literal=client_secret=<your azure AD client secret>
-
-      kubectl apply -f v1/proxy_azure_ad.yaml
-      ```
-
-    * GitHub:
-
-      ```shell
-      kubectl create secret generic github-secret -n kubernetes-dashboard \
-      --from-literal=cookie_secret=$(python -c 'import os,base64; print(base64.b64encode(os.urandom(16)).decode("ascii"))') \
-      --from-literal=client_id=<your github app client id> \
-      --from-literal=client_secret=<your github app client secret> \
-      --from-literal=github_org=<your github org> \
-      --from-literal=github_team=<your team>
-
-      kubectl apply -f v1/proxy_github.yaml
-      ```
-
-2. Deploy the k8s dashboard:
+2. Deploy dashboard server:
 
     ```shell
     kubectl apply -f v1/dashboard.yaml
     ```
 
-    The yaml file is a copy of the recommended configs from
+    The [v1/dashboard.yaml](v1/dashboard.yaml) which is a copy of the recommended configs from
     [kubernetes-dashboard](https://github.com/kubernetes/dashboard), but enabled the following
-    flags to allow SKIP LOGIN:
+    flags to allow SKIP LOGIN.
 
     ```shell
     --enable-skip-login
     --disable-settings-authorizer
     ```
 
-3. Deploy the Role bindings for the default SA, as well as ingress for the k8s dashboard web UI
-   and oauth2-proxy endpoints:
+3. A `SKIP` button will be displayed in the dashboard login UI to bypass.
 
-    ```shell
-    export INGRESS_HOST=<your host name> && \
-    cat dashboard_oauth.template.yaml | envsubst | kubectl apply -f -
-    ```
-
-## (WIP) v2: SSO with Auto-SA-Auth
+## (TODO) v2: SSO with Auto-SA-Auth
 
 At the low-level, the SA-token based authentication flow is as below:
 
