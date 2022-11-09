@@ -44,3 +44,13 @@ sudo service kubelet restart
 
 To test that NFS is successfully mounted to multiple Pods, a `test_k8s_storage.yaml` deployment
 is created to list files under the mounted directories.
+
+```shell
+kubectl apply -f test_k8s_storage.yaml
+```
+
+Optional: to configure an ingress endpoint behind oauth2-proxy:
+
+```shell
+bash test_k8s_storage.sh mysite.com
+```

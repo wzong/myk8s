@@ -94,7 +94,7 @@ With the updated login flow, SSO can be achieved.
 
     ```shell
     export OAUTH2_HOST=login.mysite.com && \
-    cat ingress_oauth2.template.yaml | envsubst | kubectl apply -f -
+    cat ingress_sso.template.yaml | envsubst '${OAUTH2_HOST}' | kubectl apply -f -
     ```
 
     ```shell
@@ -102,7 +102,9 @@ With the updated login flow, SSO can be achieved.
     export INGRESS_HOST=dashboard.mysite.com && \
     export BACKEND_SERVICE_NAME=kubernetes-dashboard && \
     export BACKEND_SERVICE_NAMESPACE=kubernetes-dashboard && \
-    cat ingress.template.yaml | envsubst | kubectl apply -f -
+    cat ingress_https.template.yaml | \
+    envsubst '${OAUTH2_HOST} ${INGRESS_HOST} ${BACKEND_SERVICE_NAME} ${BACKEND_SERVICE_NAMESPACE}' | \
+    kubectl apply -f -
     ```
 
 3. Then service can be accessible at `https://<YOUR_HOSTNAME>` and will be redirected to

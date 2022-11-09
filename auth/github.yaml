@@ -23,6 +23,9 @@ spec:
         - --pass-access-token
         - --cookie-expire=20h
         env:
+        # TODO(wzong): See https://github.com/oauth2-proxy/oauth2-proxy/issues/1724
+        - name: OAUTH2_PROXY_SCOPE
+          value: "user:email"
         ##############################################
         # OAUTH2-PROVIDER-CONFIG
         - name: OAUTH2_PROXY_COOKIE_SECRET
