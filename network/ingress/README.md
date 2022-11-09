@@ -72,6 +72,6 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: my-https-service 
+          serviceName: my-https-service
           servicePort: 443
 ```
