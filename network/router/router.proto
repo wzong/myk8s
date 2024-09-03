@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package tinymake.network;
+
+import "network/base/base.proto";
+
+// L3 IP router
+message Router {
+  NodeId node_id = 1;
+  // IP Address, e.g. 10.2.0.1
+  string address = 2;
+  // Subnet mask, e.g. 16
+  int32 subnet_mask = 3;
+  // The racks (TOR switchs) that's connected to the router
+  repeated string rack_ids = 4;
+
+  // Network controller name of the nodes which will be connected to the router.
+  // For simplicity, assuming the adapter name are same for all connected nodes.
+  // For Linux hosts, this is typically
+  //  - eth0/eth1
+  //  - predicatable name e.g. enp0s3 (en - ethernet, p - pci or o - onboard, s - hot plug slot)
+  string network_controller = 5;
+}

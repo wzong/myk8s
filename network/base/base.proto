@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package tinymake.network;
+
+// Unique ID for a single node (Machine, Router, Load Balancer, etc)
+message NodeId {
+  // 2 letter cluster id, e.g. mv
+  string cluster_id = 1;
+  // 2 letter rack id, [aa, zz]
+  string rack_id = 2;
+  // node seq number, [0, 62] (Use 0 for router address and [01-62] for machines/LBs)
+  int32 node_seq = 3;
+}

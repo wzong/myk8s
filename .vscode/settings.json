@@ -4,7 +4,9 @@
   "editor.detectIndentation": false,
   "editor.rulers": [100],
   "files.exclude": {
-    "**/*.pyc": true
+    "**/*.pyc": true,
+    "bazel-*/**": true,
   },
+  "files.insertFinalNewline": true,
   "files.trimTrailingWhitespace": true
 }
