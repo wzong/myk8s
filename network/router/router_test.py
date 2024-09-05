@@ -15,7 +15,7 @@ _TEST_ROUTER = '''
   network_controller: "eth0"
 '''
 
-_TEST_NETPLAN = '''# Auto-generated
+_TEST_NETPLAN = '''# Netplan eth0
 network:
   ethernets:
     eth0:

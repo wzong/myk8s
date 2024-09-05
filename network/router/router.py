@@ -34,7 +34,7 @@ class Router(object):
           node_id, self.router_pb.address, self.router_pb.subnet_mask, ip_offset))
     return str(network[ip_offset])
 
-  def GetNodeNetplan(self, node_id: str or base_pb2.NodeId) -> str:
+  def GetNodeNetplan(self, base.NodeId) -> str:
     ip_address = self.GetNodeIp(node_id)
     ip_mask = self.router_pb.subnet_mask
     network_controller = self.router_pb.network_controller
@@ -56,4 +56,5 @@ class Router(object):
         'version': 2,
       }
     }
-    return '# Auto-generated\n' + yaml.dump(netplan_config, default_flow_style=False)
+    return ('# Netplan %s\n' % network_controller) + yaml.dump(
+        netplan_config, default_flow_style=False)
