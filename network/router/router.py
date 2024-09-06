@@ -11,13 +11,12 @@ class Router(object):
   def __init__(self, router_pb: router_pb2.Router):
     self.router_pb = router_pb
     self.node_id = base.NodeId(router_pb.node_id)
-    if self.node_id.node_seq != 0:
-      raise ValueError('Invalid Router.node_id: node_seq must be 0, got %s' % self.node_id)
-    for rack_id in router_pb.rack_ids:
-      if self.node_id.rack_id > rack_id:
-        raise ValueError('Invalid Router.node_id: rack out of router ip range, rack %s, router %s'
-            % (rack_id, self.node_id))
     self.network = ipcalc.Network('%s/%d' % (self.router_pb.address, self.router_pb.subnet_mask))
+    if self.router_pb.address != self.network.network():
+      raise ValueError(
+          'Invalid Router.address: network address %s must be '
+          '0th addr in the subnet %s' % (self.router_pb.address, self.network.network()))
+    self.router_ip = self.GetNodeIp(self.node_id)
 
   def __contains__(self, node_id: base.NodeId) -> bool:
     return (node_id.cluster_id == self.node_id.cluster_id) and (
@@ -36,7 +35,8 @@ class Router(object):
     if ip_offset < 0 or ip_offset >= self.network.size():
       raise ValueError('Unable to assign ip address for node %s, subnet %s/%d, offset %d' % (
           node_id, self.router_pb.address, self.router_pb.subnet_mask, ip_offset))
-    return str(self.network[ip_offset])
+    # 0th addr in the subnet is the reserved network address
+    return str(self.network[ip_offset + 1])
 
   def GetNodeNetplan(self, node_id: base.NodeId) -> str:
     ip_address = self.GetNodeIp(node_id)
@@ -50,7 +50,7 @@ class Router(object):
             'addresses': ['%s/%d' % (ip_address, ip_mask)],
             'routes': [{
               'to': 'default',
-              'via': self.router_pb.address,
+              'via': self.router_ip,
             }],
             'nameservers': {
               'addresses': ['8.8.8.8', '1.1.1.1'],

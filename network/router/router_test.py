@@ -8,8 +8,8 @@ from network.router import router_pb2
 
 
 _TEST_ROUTER = '''
-  node_id { cluster_id: "mv", rack_id: "aa", node_seq: 0 }
-  address: "10.2.0.1"
+  node_id { cluster_id: "mv", rack_id: "zz", node_seq: 61 }
+  address: "10.2.0.0"
   subnet_mask: 16
   rack_ids: ["aa", "ab", "ba", "ca", "zz"]
   network_controller: "eth0"
@@ -28,11 +28,11 @@ network:
         - 1.1.1.1
       routes:
       - to: default
-        via: 10.2.0.1
+        via: 10.2.168.254
   version: 2
 '''
 
-class BaseTest(unittest.TestCase):
+class RouterTest(unittest.TestCase):
 
   def setUp(self):
     self.r_pb = text_format.Parse(_TEST_ROUTER, router_pb2.Router())
@@ -40,22 +40,10 @@ class BaseTest(unittest.TestCase):
 
   def test_Router_InvalidAddress(self):
     r_pb = self.r_pb
-    r_pb.address = '10.3.0.2'
-    r = router.Router(r_pb)
-
-  def test_Router_InvalidNodeId(self):
-    r_pb = self.r_pb
-
-    r_pb.node_id.node_seq = 1
+    r_pb.address = '10.2.0.1'
     with self.assertRaises(ValueError) as e:
       r = router.Router(r_pb)
-    self.assertTrue('Invalid Router.node_id: node_seq' in str(e.exception))
-
-    r_pb.node_id.node_seq = 0
-    r_pb.node_id.rack_id = 'cc'
-    with self.assertRaises(ValueError) as e:
-      r = router.Router(r_pb)
-    self.assertTrue('Invalid Router.node_id: rack out of router ip range' in str(e.exception))
+    self.assertIn('Invalid Router.address: network address', str(e.exception))
 
   def test_GetNodeIp(self):
     self.assertEqual(self.r.GetNodeIp(base.NodeId('mvaa00')), '10.2.0.1')
@@ -77,6 +65,7 @@ class BaseTest(unittest.TestCase):
 
   def test_GetNodeIp_NotEnoughIp(self):
     r_pb = self.r_pb
+    r_pb.node_id.rack_id = 'aa'
     r_pb.subnet_mask = 24
     r = router.Router(r_pb)
     with self.assertRaises(ValueError) as e:
