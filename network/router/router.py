@@ -17,6 +17,11 @@ class Router(object):
       if self.node_id.rack_id > rack_id:
         raise ValueError('Invalid Router.node_id: rack out of router ip range, rack %s, router %s'
             % (rack_id, self.node_id))
+    self.network = ipcalc.Network('%s/%d' % (self.router_pb.address, self.router_pb.subnet_mask))
+
+  def __contains__(self, node_id: base.NodeId) -> bool:
+    return (node_id.cluster_id == self.node_id.cluster_id) and (
+        node_id.rack_id in self.router_pb.rack_ids)
 
   def _ValidateNodeId(self, node_id: base.NodeId) -> base.NodeId:
     if node_id.cluster_id != self.node_id.cluster_id:
@@ -27,14 +32,13 @@ class Router(object):
 
   def GetNodeIp(self, node_id: base.NodeId) -> str:
     self._ValidateNodeId(node_id)
-    network = ipcalc.Network('%s/%d' % (self.router_pb.address, self.router_pb.subnet_mask))
     ip_offset = node_id.node_unique_seq
-    if ip_offset < 0 or ip_offset >= network.size():
+    if ip_offset < 0 or ip_offset >= self.network.size():
       raise ValueError('Unable to assign ip address for node %s, subnet %s/%d, offset %d' % (
           node_id, self.router_pb.address, self.router_pb.subnet_mask, ip_offset))
-    return str(network[ip_offset])
+    return str(self.network[ip_offset])
 
-  def GetNodeNetplan(self, base.NodeId) -> str:
+  def GetNodeNetplan(self, node_id: base.NodeId) -> str:
     ip_address = self.GetNodeIp(node_id)
     ip_mask = self.router_pb.subnet_mask
     network_controller = self.router_pb.network_controller

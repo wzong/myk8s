@@ -47,7 +47,7 @@ class NodeIdTest(unittest.TestCase):
     with self.assertRaises(ValueError):
       base.NodeId(node_id_pb)
 
-    node_id_pb = base_pb2.NodeId(cluster_id = 'mv', rack_id = 'ab', node_seq = 63)
+    node_id_pb = base_pb2.NodeId(cluster_id = 'mv', rack_id = 'ab', node_seq = 62)
     with self.assertRaises(ValueError):
       base.NodeId(node_id_pb)
 
@@ -58,6 +58,27 @@ class NodeIdTest(unittest.TestCase):
   def testNodeId_ToString(self):
     node_id = base.NodeId('mvab12')
     self.assertEqual(str(node_id), 'mvab12')
+
+  def testNodeId_Offset(self):
+    node_id = base.NodeId('mvab12')
+    self.assertEqual(str(node_id + 1), 'mvab13')
+    self.assertEqual(str(node_id + 64), 'mvac12')
+    self.assertEqual(str(node_id - 64), 'mvaa12')
+
+  def testNodeId_OffsetOutOfBound(self):
+    node_id = base.NodeId('mvaa00')
+    with self.assertRaises(ValueError) as e:
+      node_id + 26 * 26 * 64
+    self.assertIn('NodeId out of bound', str(e.exception))
+    with self.assertRaises(ValueError) as e:
+      node_id - 1
+    self.assertIn('NodeId out of bound', str(e.exception))
+
+  def testNodeId_OffsetReserved(self):
+    node_id = base.NodeId('mvaa00')
+    with self.assertRaises(ValueError) as e:
+      node_id + 62
+    self.assertIn('Invalid NodeId.node_seq', str(e.exception))
 
 
 class LocalNodeTest(unittest.TestCase):
