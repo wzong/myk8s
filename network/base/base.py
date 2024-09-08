@@ -3,6 +3,10 @@ import re
 
 from network.base import base_pb2
 
+# Max rows per data center
+_MAX_ROWS = 32
+# Max num racks per row
+_ROW_SIZE = 32
 # Change to these parameters requires resetting all node since it impacts ips inference.
 _RACK_SIZE = 64
 # Max node_seq within a rack. Range [0..61].
@@ -31,7 +35,7 @@ class NodeId(object):
     self.node_unique_seq = 0
 
     if type(node_id) is str:
-      m = re.match(r'([a-z]{2})([a-z]{2})([0-9]{2})', node_id)
+      m = re.fullmatch(r'([a-z]{2})([a-z]{2})([0-9]{2})', node_id)
       if m:
         self.cluster_id = m.group(1)
         self.rack_id = m.group(2)
@@ -39,9 +43,9 @@ class NodeId(object):
       else:
         raise ValueError('Invalid Node ID string: %s' % node_id)
     elif type(node_id) is base_pb2.NodeId:
-      if not re.match(r'[a-z]{2}', node_id.cluster_id):
+      if not re.fullmatch(r'[a-z]{2}', node_id.cluster_id):
         raise ValueError('Invalid NodeId.cluster_id: %s' % node_id.cluster_id)
-      if not re.match(r'[a-z]{2}', node_id.rack_id):
+      if not re.fullmatch(r'[a-z]{2}', node_id.rack_id):
         raise ValueError('Invalid NodeId.rack_id: %s' % node_id.rack_id)
       self.cluster_id = node_id.cluster_id
       self.rack_id = node_id.rack_id
@@ -53,8 +57,8 @@ class NodeId(object):
           self.node_seq, _MAX_NODE_SEQ))
 
     # Rack unique seq, 'aa' --> 0
-    for c in self.rack_id:
-      self.rack_unique_seq = self.rack_unique_seq * 26 + (ord(c) - ord('a'))
+    self.rack_unique_seq = _ROW_SIZE * (ord(self.rack_id[0]) - ord('a')) + (
+        ord(self.rack_id[1]) - ord('a'))
 
     # Node unique seq, 'aa00' --> 0
     self.node_unique_seq = self.rack_unique_seq * _RACK_SIZE + self.node_seq
@@ -67,8 +71,8 @@ class NodeId(object):
     node_seq = node_unique_seq % _RACK_SIZE
     rack_unique_seq = int(node_unique_seq / _RACK_SIZE)
 
-    chr1 = chr(int(rack_unique_seq / 26) + ord('a'))
-    chr2 = chr(rack_unique_seq % 26 + ord('a'))
+    chr1 = chr(int(rack_unique_seq / _RACK_SIZE) + ord('a'))
+    chr2 = chr(rack_unique_seq % _RACK_SIZE + ord('a'))
     if node_unique_seq < 0 or ord(chr1) > ord('z') or ord(chr2) > ord('z'):
       raise ValueError('NodeId out of bound %s + (%d)' % (self.__str__(), offset))
     node_id_pb = base_pb2.NodeId()

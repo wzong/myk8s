@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package tinymake.network;
+
+// L3 Subnet.
+message Subnet {
+  // Network Address, e.g. 10.2.0.0
+  string address = 1;
+  // Subnet mask, e.g. 16
+  int32 netmask = 2;
+  // Child subnets
+  repeated Subnet children = 3;
+}
+
+// Subnet for a specific cluster, with auto IP assignment based on node id.
+// * IP address of individual node will be assigned sequentially based on the node id,
+//   from aa00 to zz62.
+// * The max number of nodes cannnot exceed size of assignable IP addresses in the subnet.
+//   Minimum subnet to fit 26 rows x 26 racks x 62 nodes is "/16".
+// * Not all IP addresses are used, e.g. each row has 26 racks, but we reserve 32 for easier
+//   future subnetting.
+message ClusterSubnet {
+  // ID of a Cluster [a-z][a-z]
+  string cluster_id = 1;
+  // Subnet of the cluster.
+  Subnet subnet = 2;
+}
