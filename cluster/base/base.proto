@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package tinymake.network;
+package tinymake.cluster;
 
 // Unique ID for a single node (Machine, Router, Load Balancer, etc)
 message NodeId {

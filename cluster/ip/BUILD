@@ -6,7 +6,6 @@ load("@rules_python//python:proto.bzl", "py_proto_library")
 proto_library(
     name = "ip_proto",
     srcs = ["ip.proto"],
-    deps = ["//network/base:base_proto"],
 )
 
 py_proto_library(
@@ -19,7 +18,7 @@ py_library(
     srcs = ["ip.py"],
     deps = [
       ":ip_py_pb2",
-      "//network/base",
+      "//cluster/base",
       "@com_google_protobuf//:protobuf_python",
       "@ipcalc//:ipcalc",
     ],
@@ -30,6 +29,6 @@ py_test(
     srcs = ["ip_test.py"],
     deps = [
       ":ip",
-      "//network/base",
+      "//cluster/base",
     ],
 )

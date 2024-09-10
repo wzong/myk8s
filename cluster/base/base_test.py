@@ -1,8 +1,8 @@
 import json
 import unittest
 
-from network.base import base
-from network.base import base_pb2
+from cluster.base import base
+from cluster.base import base_pb2
 
 
 class NodeIdTest(unittest.TestCase):
