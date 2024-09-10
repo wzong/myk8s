@@ -10,7 +10,7 @@ from cluster.ip import ip_pb2
 
 class Subnet(object):
 
-  def __init__(self, config: ip_pb2.ClusterSubnet):
+  def __init__(self, config: ip_pb2.Subnet):
     self.address = config.address
     self.netmask = config.netmask
 
@@ -61,11 +61,11 @@ class Subnet(object):
 
 class ClusterSubnet(object):
 
-  def __init__(self, config: ip_pb2.ClusterSubnet):
-    if not re.fullmatch(r'[a-z]{2}', config.cluster_id):
-      raise ValueError('Invalid ClusterSubnet.cluster_id: %s' % config.cluster_id)
-    self.cluster_id = config.cluster_id
-    self.subnet = Subnet(config.subnet)
+  def __init__(self, cluster_id: str, subnet: ip_pb2.Subnet):
+    if not re.fullmatch(r'[a-z]{2}', cluster_id):
+      raise ValueError('Invalid ClusterSubnet.cluster_id: %s' % cluster_id)
+    self.cluster_id = cluster_id
+    self.subnet = Subnet(subnet)
     self._node_ips = {}
 
   def GetNodeIp(self, node_id: base.NodeId) -> str:

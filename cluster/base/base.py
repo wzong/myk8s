@@ -85,11 +85,18 @@ class NodeId(object):
     return self.__add__(offset * -1)
 
 
-class LocalNode(object):
-  """This lib runs locally on a node."""
+class AbstractNode(object):
+  """Abstraction of a node."""
 
-  def __init__(self, node_id: str or base_pb2.NodeId):
-    self.node_id = NodeId(node_id)
+  def __init__(self, node: base_pb2.Node):
+    self.node_id = NodeId(node.node_id)
+    self.node_type = node.node_type
 
-  def GetNetIfAddress(self):
-    return psutil.net_if_addrs()
+  def GetNetworkAdapter(self, offset = 0) -> str:
+    return 'eth%d' % offset
+
+  def GetHeadScript(self) -> str:
+    return '#!/bin/bash'
+
+  def GetIpSetupScript(self) -> str:
+    return ''

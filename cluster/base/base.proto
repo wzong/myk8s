@@ -11,3 +11,11 @@ message NodeId {
   // node seq number, [0, 62] (Use 0 for router address and [01-62] for machines/LBs)
   int32 node_seq = 3;
 }
+
+// Node in the cluster
+message Node {
+  NodeId node_id = 1;
+  string node_type = 2;
+  // Manually configured and auto-populated labels for the node.
+  repeated string labels = 3;
+}

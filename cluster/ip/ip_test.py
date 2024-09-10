@@ -9,27 +9,24 @@ from cluster.ip import ip_pb2
 
 
 _TEST_CLUSTER_SUBNET = '''
-  cluster_id: "mv"
-  subnet {
-    address: "10.2.0.0"
-    netmask: 16
-    children {
-      address: "10.2.0.0"
-      netmask: 26
-    }
-    children {
-      address: "10.2.2.0"
-      netmask: 24
-    }
-  }
+address: "10.2.0.0"
+netmask: 16
+children {
+  address: "10.2.0.0"
+  netmask: 26
+}
+children {
+  address: "10.2.2.0"
+  netmask: 24
+}
 '''
 
 
 class IpTest(unittest.TestCase):
 
   def setUp(self):
-    self.config = text_format.Parse(_TEST_CLUSTER_SUBNET, ip_pb2.ClusterSubnet())
-    self.cluster = ip.ClusterSubnet(self.config)
+    self.subnet = text_format.Parse(_TEST_CLUSTER_SUBNET, ip_pb2.Subnet())
+    self.cluster = ip.ClusterSubnet('mv', self.subnet)
 
   def test_Subnet(self):
     subnet = self.cluster.subnet
@@ -38,21 +35,20 @@ class IpTest(unittest.TestCase):
     self.assertEqual(subnet.broadcast, '10.2.255.255')
 
   def test_InvalidClusterId(self):
-    self.config.cluster_id = 'invalid'
     with self.assertRaises(ValueError) as e:
-      self.cluster = ip.ClusterSubnet(self.config)
+      self.cluster = ip.ClusterSubnet('invalid', self.subnet)
     self.assertIn('Invalid ClusterSubnet.cluster_id', str(e.exception))
 
   def test_InvalidAddress(self):
-    self.config.subnet.address = '10.2.1.0'
+    self.subnet.address = '10.2.1.0'
     with self.assertRaises(ValueError) as e:
-      self.cluster = ip.ClusterSubnet(self.config)
+      self.cluster = ip.ClusterSubnet('mv', self.subnet)
     self.assertIn('Invalid Subnet.address: network address must be 0th', str(e.exception))
 
   def test_InvalidChildAddress(self):
-    self.config.subnet.children.append(ip_pb2.Subnet(address = '10.3.1.0', netmask = 24))
+    self.subnet.children.append(ip_pb2.Subnet(address = '10.3.1.0', netmask = 24))
     with self.assertRaises(ValueError) as e:
-      self.cluster = ip.ClusterSubnet(self.config)
+      self.cluster = ip.ClusterSubnet('mv', self.subnet)
     self.assertIn('Invalid Subnet.address: not a child subnet', str(e.exception))
 
   def test_GetNodeIp(self):
@@ -83,9 +79,9 @@ class IpTest(unittest.TestCase):
     self.assertEqual(len(set([v for v in node_ips.values()])), len(node_ips))
 
   def test_GetAllNodeIps_FitOneRack(self):
-    self.config.subnet.netmask = 26
-    self.config.subnet.children.clear()
-    self.cluster = ip.ClusterSubnet(self.config)
+    self.subnet.netmask = 26
+    self.subnet.children.clear()
+    self.cluster = ip.ClusterSubnet('mv', self.subnet)
 
     # Subnet size can only fit aa rack
     node_ips = self.cluster.GetAllNodeIps()
