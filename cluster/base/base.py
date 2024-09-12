@@ -1,7 +1,7 @@
 import psutil
 import re
 
-from cluster.base import base_pb2
+from cluster.protos import base_pb2
 
 # Max rows per data center
 _MAX_ROWS = 32

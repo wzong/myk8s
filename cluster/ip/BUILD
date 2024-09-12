@@ -5,23 +5,12 @@ load("@rules_python//python:proto.bzl", "py_proto_library")
 
 package(default_visibility = ["//visibility:public"])
 
-proto_library(
-    name = "ip_proto",
-    srcs = ["ip.proto"],
-    deps = ["//cluster/base:base_proto"],
-)
-
-py_proto_library(
-    name = "ip_py_pb2",
-    deps = [":ip_proto"],
-)
-
 py_library(
     name = "ip",
     srcs = ["ip.py"],
     deps = [
-      ":ip_py_pb2",
       "//cluster/base",
+      "//cluster/protos:ip_py_pb2",
       "@com_google_protobuf//:protobuf_python",
       "@ipcalc//:ipcalc",
       "@pyyaml//:pyyaml",

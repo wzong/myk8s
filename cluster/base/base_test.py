@@ -2,7 +2,7 @@ import json
 import unittest
 
 from cluster.base import base
-from cluster.base import base_pb2
+from cluster.protos import base_pb2
 
 
 class NodeIdTest(unittest.TestCase):

@@ -5,21 +5,11 @@ load("@pip_deps//:requirements.bzl", "requirement")
 
 package(default_visibility=["//visibility:public"])
 
-proto_library(
-    name = "base_proto",
-    srcs = ["base.proto"],
-)
-
-py_proto_library(
-    name = "base_py_pb2",
-    deps = [":base_proto"],
-)
-
 py_library(
     name = "base",
     srcs = ["base.py"],
     deps = [
-      ":base_py_pb2",
+      "//cluster/protos:base_py_pb2",
       requirement("psutil"),
     ],
 )

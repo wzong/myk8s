@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package tinymake.cluster;
 
-import "cluster/base/base.proto";
+import "cluster/protos/base.proto";
 
 // Route to reach different destination networks
 message Gateway {

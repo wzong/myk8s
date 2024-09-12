@@ -3,9 +3,9 @@ import unittest
 
 from google.protobuf import text_format
 from cluster.base import base
-from cluster.base import base_pb2
 from cluster.ip import ip
-from cluster.ip import ip_pb2
+from cluster.protos import base_pb2
+from cluster.protos import ip_pb2
 
 
 _TEST_CLUSTER_SUBNET = '''

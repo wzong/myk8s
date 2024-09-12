@@ -5,8 +5,8 @@ import yaml
 from ipcalc import ipcalc
 
 from cluster.base import base
-from cluster.base import base_pb2
-from cluster.ip import ip_pb2
+from cluster.protos import base_pb2
+from cluster.protos import ip_pb2
 
 
 class Subnet(object):

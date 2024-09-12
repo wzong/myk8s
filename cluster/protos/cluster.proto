@@ -2,8 +2,8 @@ syntax = "proto3";
 
 package tinymake.cluster;
 
-import "cluster/base/base.proto";
-import "cluster/ip/ip.proto";
+import "cluster/protos/base.proto";
+import "cluster/protos/ip.proto";
 
 // Configuration for a cluster
 message Cluster {
@@ -19,6 +19,13 @@ message Cluster {
   //   future subnetting.
   Subnet subnet = 2;
 
-  // Nodes in the cluster
-  repeated Node nodes = 3;
+  // Load balancer nodes in the cluster
+  repeated Node load_balancers = 3;
+  // Control Plane nodes in the cluster
+  repeated Node control_planes = 4;
+  // Worker nodes in the cluster
+  repeated Node workers = 5;
+
+  // Dedicated nodes to run Ingress controllers
+  repeated NodeId ingress_controllers = 6;
 }
