@@ -1,5 +1,6 @@
 import re
 import typing
+import yaml
 
 from ipcalc import ipcalc
 
@@ -13,6 +14,7 @@ class Subnet(object):
   def __init__(self, config: ip_pb2.Subnet):
     self.address = config.address
     self.netmask = config.netmask
+    self.gateways = config.gateways
 
     self._network = ipcalc.Network('%s/%d' % (self.address, self.netmask))
     if self.address != self._network.network():
@@ -38,25 +40,45 @@ class Subnet(object):
   def size(self) -> int:
     return self._network.size()
 
-  def GetIpAddress(self, offset: str) -> str:
-    """Returns the IP/netmask for the given index offset within the subnet."""
-    address = str(ipcalc.IP(int(self._network.host_first()) + offset))
-    subnet = self.GetSubnet(address)
-    if subnet.address == address:
-      raise ValueError('Invalid IP address: cannot be network of subnet %s' % self)
-    if subnet.broadcast == address:
-      raise ValueError('Invalid IP address: cannot be broadcast of subnet %s' % self)
-    return '%s/%d' % (address, subnet.netmask)
+  def GetIp(self, offset: str):
+    """Returns the IP/subnet for the given index offset within the subnet."""
+    return str(ipcalc.IP(int(self._network.host_first()) + offset))
 
   def GetSubnet(self, address: str):
     """Returns the subnet that the address belongs to, or None if not in the subnet."""
+    result = None
     if address not in self._network:
       return None
     for child in self.children:
       subnet = child.GetSubnet(address)
       if subnet:
         return subnet
+    if self.address == address:
+      raise ValueError('Invalid IP address: cannot be network of subnet %s' % self)
+    if self.broadcast == address:
+      raise ValueError('Invalid IP address: cannot be broadcast of subnet %s' % self)
     return self
+
+  def GetNetplan(self, address: str, network_adapter: str) -> str:
+    subnet = self.GetSubnet(address)
+    routes = [{'to': g.to, 'via': g.via} for g in subnet.gateways]
+    netplan_config = {
+      'network': {
+        'ethernets': {
+          network_adapter: {
+            'dhcp4': False,
+            'addresses': '%s/%d' % (address, subnet.netmask),
+            'routes': routes,
+            'nameservers': {
+              'addresses': ['8.8.8.8', '1.1.1.1'],
+            },
+          }
+        },
+        'version': 2,
+      }
+    }
+    return ('# Netplan %s\n' % network_adapter) + yaml.dump(
+        netplan_config, default_flow_style=False)
 
 
 class ClusterSubnet(object):
@@ -68,7 +90,7 @@ class ClusterSubnet(object):
     self.subnet = Subnet(subnet)
     self._node_ips = {}
 
-  def GetNodeIp(self, node_id: base.NodeId) -> str:
+  def CheckNode(self, node_id: base.NodeId):
     if str(node_id) in self._node_ips:
       return self._node_ips[str(node_id)]
 
@@ -78,9 +100,13 @@ class ClusterSubnet(object):
     ip_offset = node_id.node_unique_seq
     if ip_offset < 0 or ip_offset >= self.subnet.size():
       raise ValueError('Unable to assign ip address for node %s, subnet %s/%d, offset %d' % (
-          node_id, self.router_pb.address, self.subnet, ip_offset))
-    # Offset 0 is the network address and should be skipped
-    return self.subnet.GetIpAddress(ip_offset)
+          node_id, self.subnet.address, self.subnet, ip_offset))
+
+  def GetNodeIp(self, node_id: base.NodeId) -> str:
+    self.CheckNode(node_id)
+    address = self.subnet.GetIp(node_id.node_unique_seq)
+    subnet = self.subnet.GetSubnet(address)
+    return '%s/%d' % (address, subnet.netmask)
 
   def GetAllNodeIps(self) -> typing.Dict[str, str]:
     if self._node_ips:
@@ -97,3 +123,8 @@ class ClusterSubnet(object):
             return self._node_ips
           self._node_ips[str(node_id)] = self.GetNodeIp(node_id)
     return self._node_ips
+
+  def GetNodeNetplan(self, node_id: base.NodeId, network_adapter: str) -> str:
+    self.CheckNode(node_id)
+    address = self.subnet.GetIp(node_id.node_unique_seq)
+    return self.subnet.GetNetplan(address, network_adapter)

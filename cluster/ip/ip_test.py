@@ -14,11 +14,35 @@ netmask: 16
 children {
   address: "10.2.0.0"
   netmask: 26
+  gateways {
+    to: '0.0.0.0/0'
+    via: '10.2.0.1'
+  }
 }
 children {
   address: "10.2.2.0"
   netmask: 24
 }
+gateways {
+  to: '0.0.0.0/0'
+  via: '10.2.3.1'
+}
+'''
+
+_TEST_NETPLAN = '''# Netplan eth0
+network:
+  ethernets:
+    eth0:
+      addresses: 10.2.0.2/26
+      dhcp4: false
+      nameservers:
+        addresses:
+        - 8.8.8.8
+        - 1.1.1.1
+      routes:
+      - to: 0.0.0.0/0
+        via: 10.2.0.1
+  version: 2
 '''
 
 
@@ -89,6 +113,9 @@ class IpTest(unittest.TestCase):
 
     # Verifies no duplicate ip addresses are assigned to different nodes
     self.assertEqual(len(set([v for v in node_ips.values()])), len(node_ips))
+
+  def test_GetNodeNetplan(self):
+    self.assertEqual(self.cluster.GetNodeNetplan(base.NodeId('mvaa01'), 'eth0'), _TEST_NETPLAN)
 
 
 if __name__ == "__main__":

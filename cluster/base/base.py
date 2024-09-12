@@ -96,7 +96,10 @@ class AbstractNode(object):
     return 'eth%d' % offset
 
   def GetHeadScript(self) -> str:
-    return '#!/bin/bash'
+    return '#!/bin/bash\n'
 
-  def GetIpSetupScript(self) -> str:
-    return ''
+  def GetIpSetupScript(self, address: str) -> str:
+    return '# IP SETUP SCRIPT: NOT IMPLEMENTED\n'
+
+  def GetKubeadmScript(self) -> str:
+    return '# Kubeadm SCRIPT: NOT IMPLEMENTED\n'

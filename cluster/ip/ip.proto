@@ -2,6 +2,16 @@ syntax = "proto3";
 
 package tinymake.cluster;
 
+import "cluster/base/base.proto";
+
+// Route to reach different destination networks
+message Gateway {
+  // Destination network in the form of '0.0.0.0/0'.
+  string to = 1;
+  // Gateway to reach the destination network
+  string via = 2;
+}
+
 // L3 Subnet.
 message Subnet {
   // Network Address, e.g. 10.2.0.0
@@ -10,4 +20,6 @@ message Subnet {
   int32 netmask = 2;
   // Child subnets
   repeated Subnet children = 3;
+  // Network gateways
+  repeated Gateway gateways = 4;
 }

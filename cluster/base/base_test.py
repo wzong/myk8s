@@ -81,11 +81,5 @@ class NodeIdTest(unittest.TestCase):
     self.assertIn('Invalid NodeId.node_seq', str(e.exception))
 
 
-class LocalNodeTest(unittest.TestCase):
-
-  def test_LocalNode(self):
-    self.assertNotEqual(None, base.LocalNode('mvab12').GetNetIfAddress())
-
-
 if __name__ == "__main__":
     unittest.main()

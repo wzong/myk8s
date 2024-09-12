@@ -4,7 +4,10 @@ load("@rules_python//python:proto.bzl", "py_proto_library")
 proto_library(
     name = "config_proto",
     srcs = ["config.proto"],
-    deps = ["//cluster/ip:ip_proto"],
+    deps = [
+        "//cluster/base:base_proto",
+        "//cluster/ip:ip_proto",
+    ],
 )
 
 py_proto_library(

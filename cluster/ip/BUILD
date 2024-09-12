@@ -8,6 +8,7 @@ package(default_visibility = ["//visibility:public"])
 proto_library(
     name = "ip_proto",
     srcs = ["ip.proto"],
+    deps = ["//cluster/base:base_proto"],
 )
 
 py_proto_library(
@@ -23,6 +24,7 @@ py_library(
       "//cluster/base",
       "@com_google_protobuf//:protobuf_python",
       "@ipcalc//:ipcalc",
+      "@pyyaml//:pyyaml",
     ],
 )
 

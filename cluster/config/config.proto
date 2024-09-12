@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package tinymake.cluster;
 
+import "cluster/base/base.proto";
 import "cluster/ip/ip.proto";
 
 // Configuration for a cluster
@@ -16,5 +17,8 @@ message Cluster {
   //   Minimum subnet to fit 26 rows x 26 racks x 62 nodes is "/16".
   // * Not all IP addresses are used, e.g. each row has 26 racks, but we reserve 32 for easier
   //   future subnetting.
-  Subnet subnet = 3;
+  Subnet subnet = 2;
+
+  // Nodes in the cluster
+  repeated Node nodes = 3;
 }
