@@ -75,24 +75,24 @@ class IpTest(unittest.TestCase):
       self.cluster = ip.ClusterSubnet('mv', self.subnet)
     self.assertIn('Invalid Subnet.address: not a child subnet', str(e.exception))
 
-  def test_GetNodeIp(self):
+  def test_GetNodeAddress(self):
     # Child subnet 10.2.0.0/26
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvaa00')), '10.2.0.1/26')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvaa61')), '10.2.0.62/26')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvaa00')), '10.2.0.1/26')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvaa61')), '10.2.0.62/26')
 
     # Cluster 10.2.0.0/16
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvab00')), '10.2.0.65/16')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvab61')), '10.2.0.126/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvab00')), '10.2.0.65/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvab61')), '10.2.0.126/16')
 
     # Child subnet 10.2.2.0/24
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvai00')), '10.2.2.1/24')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mval61')), '10.2.2.254/24')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvai00')), '10.2.2.1/24')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mval61')), '10.2.2.254/24')
 
     # Cluster 10.2.0.0/16
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvam00')), '10.2.3.1/16')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvba00')), '10.2.8.1/16')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvia00')), '10.2.64.1/16')
-    self.assertEqual(self.cluster.GetNodeIp(base.NodeId('mvzz61')), '10.2.206.126/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvam00')), '10.2.3.1/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvba00')), '10.2.8.1/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvia00')), '10.2.64.1/16')
+    self.assertEqual(self.cluster.GetNodeAddress(base.NodeId('mvzz61')), '10.2.206.126/16')
 
   def test_GetAllNodeIps_FitAllRacks(self):
     # Subnet size can fit all racks [aa - zz]

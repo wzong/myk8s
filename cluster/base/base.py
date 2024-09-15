@@ -83,23 +83,3 @@ class NodeId(object):
 
   def __sub__(self, offset: int):
     return self.__add__(offset * -1)
-
-
-class AbstractNode(object):
-  """Abstraction of a node."""
-
-  def __init__(self, node: base_pb2.Node):
-    self.node_id = NodeId(node.node_id)
-    self.node_type = node.node_type
-
-  def GetNetworkAdapter(self, offset = 0) -> str:
-    return 'eth%d' % offset
-
-  def GetHeadScript(self) -> str:
-    return '#!/bin/bash\n'
-
-  def GetIpSetupScript(self, address: str) -> str:
-    return '# IP SETUP SCRIPT: NOT IMPLEMENTED\n'
-
-  def GetKubeadmScript(self) -> str:
-    return '# Kubeadm SCRIPT: NOT IMPLEMENTED\n'

@@ -104,7 +104,11 @@ class ClusterSubnet(object):
 
   def GetNodeIp(self, node_id: base.NodeId) -> str:
     self.CheckNode(node_id)
-    address = self.subnet.GetIp(node_id.node_unique_seq)
+    return self.subnet.GetIp(node_id.node_unique_seq)
+
+  def GetNodeAddress(self, node_id: base.NodeId) -> str:
+    self.CheckNode(node_id)
+    address = self.GetNodeIp(node_id)
     subnet = self.subnet.GetSubnet(address)
     return '%s/%d' % (address, subnet.netmask)
 
