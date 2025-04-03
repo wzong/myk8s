@@ -39,8 +39,24 @@ traffic to the Ingress. The benefits are:
 After k8s cluster is ready, simply execute:
 
 For k8s version 1.28 - 1.32
-```
+
+```shell
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/baremetal/deploy.yaml
+```
+
+Use static `nodePort` (30001 for http, 30002 for https):
+
+```shell
+kubectl patch -f https://raw.githubusercontent.com/wzong/myk8s/master/network/ingress/ingress_service_patch.yaml
+```
+
+Test with an example:
+
+```shell
+export DOMAIN=mysite.com && \
+cat ingress_example.template.yaml | \
+envsubst '${DOMAIN}' | \
+kubectl apply -f -
 ```
 
 ## SSL pass through

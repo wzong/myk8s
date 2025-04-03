@@ -1,20 +1,29 @@
-# Deployment for the hello app 
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: examples
+  labels:
+    name: examples
+
+---
+
 apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
 kind: Deployment
 metadata:
-  name: hello-deployment
+  name: hello-ingress
+  namespace: examples
 spec:
   selector:
     matchLabels:
-      app: hello
+      app: hello-ingress
   replicas: 2 # tells deployment to run 2 pods matching the template
   template:
     metadata:
       labels:
-        app: hello
+        app: hello-ingress
     spec:
       containers:
-      - name: hello
+      - name: hello-ingress
         image: gcr.io/google-samples/hello-app:1.0
         ports:
         - containerPort: 8080
@@ -27,11 +36,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: hello-service
+  name: hello-ingress
+  namespace: examples
 spec:
   type: ClusterIP
   selector:
-    app: hello
+    app: hello-ingress
   ports:
   - port: 80
     targetPort: 8080
@@ -42,17 +52,20 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: hello-ingress
+  namespace: examples
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
-  - host: hello.<DOMAIN>
+  - host: hello.${DOMAIN}
     http:
       paths:
       - path: /
         pathType: 'Prefix'
         backend:
           service:
-            name: hello-service
+            name: hello-ingress
             port:
               number: 80
-
