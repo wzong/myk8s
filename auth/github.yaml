@@ -64,7 +64,7 @@ spec:
               name: oauth2-github-secret
               key: cookie_domain
         ##############################################
-        image: quay.io/oauth2-proxy/oauth2-proxy:latest
+        image: quay.io/oauth2-proxy/oauth2-proxy:v7.3.0
         imagePullPolicy: Always
         name: oauth2-proxy
         ports:

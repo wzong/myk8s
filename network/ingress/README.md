@@ -24,13 +24,6 @@ K8s provided the following ways:
 For Ingress, I'm using the bare-metal solution from
 [nginx-ingress](https://kubernetes.github.io/ingress-nginx/)
 
-The standard deployment does not work out-of-box, so minor changes are made:
-
-* Use fixed `nodePort` (30001 & 30002) for http/https, otherwise k8s will
-  auto-assign a port, which makes it more difficult for me to set up port
-  forwarding (sometimes I destroy the re-create the cluster to test features.
-  so I want the ports to be static to avoid reconfiguring port forwarding).
-
 ## SSL certificate
 
 The default self-signed certificate is used, because I want to use a separate
@@ -45,8 +38,9 @@ traffic to the Ingress. The benefits are:
 
 After k8s cluster is ready, simply execute:
 
+For k8s version 1.28 - 1.32
 ```
-kubectl apply -f https://raw.githubusercontent.com/wzong/myk8s/master/network/ingress/ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.12.0/deploy/static/provider/baremetal/deploy.yaml
 ```
 
 ## SSL pass through

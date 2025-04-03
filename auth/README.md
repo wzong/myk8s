@@ -66,7 +66,7 @@ With the updated login flow, SSO can be achieved.
       --from-literal=github_team=<your github team> \
       --from-literal=cookie_domain=<your SSO domain>
 
-      kubectl apply -f v1/proxy_github.yaml
+      kubectl apply -f github.yaml
       ```
 
       Note: The access token of github never expires unless end user explicitly revoke the OAuth
