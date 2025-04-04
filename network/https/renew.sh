@@ -1,2 +1,13 @@
-certbot renew --webroot --noninteractive --agree-tos --email $EMAIL --webroot-path=/usr/share/nginx/html --standalone-supported-challenges tls-sni-01
-/usr/sbin/service nginx reload
+#!/bin/bash
+
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source ${SCRIPT_DIR}/common.sh
+
+# Print certbot plugins
+/opt/certbot/bin/certbot plugins
+
+# Renew cert and reload nginx
+/opt/certbot/bin/certbot renew
+nginx -s reload

@@ -2,25 +2,17 @@
 
 set -e
 
-if [ ! -d /etc/letsencrypt/live/$DOMAIN ]; then
-  certbot certonly --noninteractive --agree-tos --email $EMAIL --standalone -d *.$DOMAIN -d $DOMAIN
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source ${SCRIPT_DIR}/common.sh
 
-function check_arg() {
-  if [[ -z $3 ]]; then
-    echo "Required argument not provided: $1"
-    exit 1
-  else
-    echo "$2: $3"
-  fi
-}
-check_arg "EMAIL" "SSL Email" $EMAIL
+# Required arguments
 check_arg "DOMAIN" "SSL Domain" $DOMAIN
-check_arg "BACKEND_HTTP" "Backend http" $BACKEND_HTTP
-check_arg "BACKEND_HTTPS" "Backend https" $BACKEND_HTTPS
+check_arg "BACKEND_HTTP" "Backend http" $INGRESS_IP
 
-sed "s,<DOMAIN>,$DOMAIN,g" ./nginx.conf \
-| sed "s,<BACKEND_HTTPS>,$BACKEND_HTTPS,g" \
-| sed "s,<BACKEND_HTTP>,$BACKEND_HTTP,g" > /etc/nginx/nginx.conf
+# Set up Nginx reverse proxy config
+cat /usr/src/nginx.conf | \
+  envsubst '${INGRESS_IP},${DOMAIN}' | \
+  tee /etc/nginx/nginx.conf
 
+# Start Nginx server
 nginx -g "daemon off; error_log /dev/stderr notice;"
