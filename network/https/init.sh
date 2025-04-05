@@ -23,3 +23,13 @@ if [ ! -d /etc/letsencrypt/live/$DOMAIN ]; then
     -d "$DOMAIN" \
     -d "*.$DOMAIN"
 fi
+
+if [ ! -d /etc/letsencrypt/live/corp.$DOMAIN ]; then
+  /opt/certbot/bin/certbot certonly \
+    --agree-tos \
+    --authenticator dns-cloudflare \
+    --dns-cloudflare-credentials /etc/letsencrypt/cloudflare.ini \
+    --dns-cloudflare-propagation-seconds 90 \
+    --keep-until-expiring --non-interactive --expand \
+    -d "*.corp.$DOMAIN"
+fi

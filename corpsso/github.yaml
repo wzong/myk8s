@@ -22,10 +22,12 @@ spec:
         - --http-address=0.0.0.0:4180
         - --pass-access-token
         - --cookie-expire=20h
+        - --set-authorization-header=true
+        - --reverse-proxy=true
         env:
         # TODO(wzong): See https://github.com/oauth2-proxy/oauth2-proxy/issues/1724
         - name: OAUTH2_PROXY_SCOPE
-          value: "user:email"
+          value: "user:email read:user read:org"
         ##############################################
         # OAUTH2-PROVIDER-CONFIG
         - name: OAUTH2_PROXY_COOKIE_SECRET
@@ -64,7 +66,7 @@ spec:
               name: oauth2-github-secret
               key: cookie_domain
         ##############################################
-        image: quay.io/oauth2-proxy/oauth2-proxy:v7.3.0
+        image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.2
         imagePullPolicy: Always
         name: oauth2-proxy
         ports:

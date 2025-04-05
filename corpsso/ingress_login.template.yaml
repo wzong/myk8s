@@ -22,7 +22,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: ${OAUTH2_HOST}
+  - host: login.corp.${DOMAIN}
     http:
       paths:
       - path: /oauth2

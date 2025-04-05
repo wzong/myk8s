@@ -9,5 +9,5 @@ source ${SCRIPT_DIR}/common.sh
 /opt/certbot/bin/certbot plugins
 
 # Renew cert and reload nginx
-/opt/certbot/bin/certbot renew
+/opt/certbot/bin/certbot renew "$@"
 nginx -s reload

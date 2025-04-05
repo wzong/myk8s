@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/auth-url: "https://login.corp.${DOMAIN}/oauth2/auth"
+    nginx.ingress.kubernetes.io/auth-signin: "https://login.corp.${DOMAIN}/oauth2/start?rd=$scheme://$best_http_host$is_args$args"
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  name: corpsso-${BACKEND_SERVICE_NAME}
+  namespace: ${BACKEND_SERVICE_NAMESPACE}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: ${NAME}.corp.${DOMAIN}
+    http:
+      paths:
+      - path: /
+        pathType: 'Prefix'
+        backend:
+          service:
+            name: ${BACKEND_SERVICE_NAME}
+            port:
+              number: 80
