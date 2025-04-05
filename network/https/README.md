@@ -73,4 +73,16 @@ sudo docker run -d --restart=always \
   wzong/myk8s-https
 ```
 
+1. Dry run test for renewal
+
+```shell
+sudo docker exec <container id> bash /usr/src/renewal.sh --dry-run
+```
+
+1. Check certbot logs:
+
+```shell
+sudo docker exec <container id> cat /var/log/letsencrypt/letsencrypt.log
+```
+
 The Ingress can be accessed with `*.$your_domain`.

@@ -3,4 +3,5 @@
 Installation Steps
 
 1. Ingress controller: [doc](/network/ingress/README.md)
-2. Auth: [doc](/auth/README.md)
+1. Https: [doc](/network/https/README.md)
+1. Auth: [doc](/auth/README.md)
